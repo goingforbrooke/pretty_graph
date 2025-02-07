@@ -1,0 +1,39 @@
+name: Pretty Commit
+
+on:
+  schedule:
+    # Run daily at noon UTC.
+    - cron: "0 12 * * *"
+
+jobs:
+  gitfiti:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write           # 'write' access to repository contents
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: configure git
+        run: |
+          git config --local user.name "${{ secrets.GIT_USER_NAME }}"
+          git config --local user.email "${{ secrets.GIT_USER_EMAIL }}"
+
+      - name: generate commit pattern
+        run: |
+          # Put thicker stripes on Sunday, Tuesday, Thursday, and Friday.
+          day_of_week=$(date +%u)
+          if [[ "$day_of_week" =~ ^(1|3|5|7)$ ]]; then
+            commit_count=200
+          else
+            commit_count=100
+          fi
+          
+          for i in $(seq 1 $commit_count); do
+            echo "$(date)" >> gitfiti-dummy.txt
+            git add gitfiti-dummy.txt
+            git commit -m "Gitfiti commit #$i"
+          done
+
+      - name: push commits
+        run: git push
