@@ -4,6 +4,8 @@ on:
   schedule:
     # Run daily at noon UTC.
     - cron: "0 12 * * *"
+  # ALlow manual triggers.
+  workflow_dispatch:
 
 jobs:
   gitfiti:
